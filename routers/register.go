@@ -24,7 +24,7 @@ func Register(rw http.ResponseWriter, r *http.Request) {
 		return
 
 	}
-	if len(t.Password) <= 6 {
+	if len(t.Password) < 6 {
 		http.Error(rw, "contraseña de usuario requerido", http.StatusBadRequest)
 		return
 	}
