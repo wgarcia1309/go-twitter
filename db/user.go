@@ -14,7 +14,7 @@ func NewUser(u models.User) (string, bool, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 	db := MongoCN.Database(os.Getenv("DATABASENAME"))
-	collection := db.Collection("USER_COLLECTION")
+	collection := db.Collection(os.Getenv("USER_COLLECTION"))
 
 	u.Password, _ = encrypt(u.Password)
 
@@ -32,7 +32,7 @@ func EmailExist(email string) (models.User, bool, string) {
 	defer cancel()
 
 	db := MongoCN.Database(os.Getenv("DATABASENAME"))
-	collection := db.Collection("USER_COLLECTION")
+	collection := db.Collection(os.Getenv("USER_COLLECTION"))
 	condition := bson.M{"email": email}
 
 	var user models.User
@@ -49,7 +49,7 @@ func UsernameExist(username string) (models.User, bool, string) {
 	defer cancel()
 
 	db := MongoCN.Database(os.Getenv("DATABASENAME"))
-	collection := db.Collection("USER_COLLECTION")
+	collection := db.Collection(os.Getenv("USER_COLLECTION"))
 	condition := bson.M{"username": username}
 
 	var user models.User
