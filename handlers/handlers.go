@@ -7,10 +7,13 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
+	"github.com/wgarcia1309/go-twitter/middleware"
+	"github.com/wgarcia1309/go-twitter/routers"
 )
 
 func Handlers() {
 	router := mux.NewRouter()
+	router.HandleFunc("/registro", middleware.CheckDB(routers.Register)).Methods("POST")
 	PORT := os.Getenv("PORT")
 	if PORT == "" {
 		PORT = "8080"
