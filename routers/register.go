@@ -17,29 +17,37 @@ func Register(rw http.ResponseWriter, r *http.Request) {
 	}
 	if len(t.Email) == 0 {
 		http.Error(rw, "Email de usuario requerido", http.StatusBadRequest)
+		return
 	}
 	if len(t.Username) <= 6 {
 		http.Error(rw, "nombre de usuario requerido", http.StatusBadRequest)
+		return
+
 	}
 	if len(t.Password) <= 6 {
 		http.Error(rw, "contraseña de usuario requerido", http.StatusBadRequest)
+		return
 	}
 	_, founded, _ := db.EmailExist(t.Email)
 	if founded {
 		http.Error(rw, "ya existe un usuario regristrado con ese email", http.StatusBadRequest)
+		return
 	}
 	_, founded, _ = db.UsernameExist(t.Username)
 	if founded {
 		http.Error(rw, "ya existe un usuario regristrado con ese nombre de usuario", http.StatusBadRequest)
+		return
 	}
 
 	_, status, err := db.NewUser(t)
 	if err != nil {
 		http.Error(rw, "error saving in db"+err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	if !status {
 		http.Error(rw, "can't save user in db", http.StatusInternalServerError)
+		return
 	}
 	rw.WriteHeader(http.StatusAccepted)
 }
