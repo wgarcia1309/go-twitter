@@ -9,37 +9,37 @@ import (
 )
 
 func Register(rw http.ResponseWriter, r *http.Request) {
-	var t models.User
-	err := json.NewDecoder(r.Body).Decode(&t)
+	var u models.User
+	err := json.NewDecoder(r.Body).Decode(&u)
 	if err != nil {
 		http.Error(rw, "Error decoding"+err.Error(), http.StatusBadRequest)
 		return
 	}
-	if len(t.Email) == 0 {
+	if len(u.Email) == 0 {
 		http.Error(rw, "Email de usuario requerido", http.StatusBadRequest)
 		return
 	}
-	if len(t.Username) == 0 {
+	if len(u.Username) == 0 {
 		http.Error(rw, "nombre de usuario requerido", http.StatusBadRequest)
 		return
 
 	}
-	if len(t.Password) < 6 {
+	if len(u.Password) < 6 {
 		http.Error(rw, "contraseña de usuario requerido", http.StatusBadRequest)
 		return
 	}
-	_, founded, _ := db.EmailExist(t.Email)
+	_, founded, _ := db.EmailExist(u.Email)
 	if founded {
 		http.Error(rw, "ya existe un usuario regristrado con ese email", http.StatusBadRequest)
 		return
 	}
-	_, founded, _ = db.UsernameExist(t.Username)
+	_, founded, _ = db.UsernameExist(u.Username)
 	if founded {
 		http.Error(rw, "ya existe un usuario regristrado con ese nombre de usuario", http.StatusBadRequest)
 		return
 	}
 
-	_, status, err := db.NewUser(t)
+	_, status, err := db.NewUser(u)
 	if err != nil {
 		http.Error(rw, "error saving in db"+err.Error(), http.StatusInternalServerError)
 		return
