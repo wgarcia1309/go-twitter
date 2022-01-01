@@ -19,7 +19,7 @@ func Register(rw http.ResponseWriter, r *http.Request) {
 		http.Error(rw, "Email de usuario requerido", http.StatusBadRequest)
 		return
 	}
-	if len(t.Username) <= 6 {
+	if len(t.Username) == 0 {
 		http.Error(rw, "nombre de usuario requerido", http.StatusBadRequest)
 		return
 
