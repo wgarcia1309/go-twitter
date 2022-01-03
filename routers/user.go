@@ -8,7 +8,7 @@ import (
 	"github.com/wgarcia1309/go-twitter/models"
 )
 
-func Register(rw http.ResponseWriter, r *http.Request) {
+func NewUser(rw http.ResponseWriter, r *http.Request) {
 	var u models.User
 	err := json.NewDecoder(r.Body).Decode(&u)
 	if err != nil {
@@ -50,4 +50,49 @@ func Register(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 	rw.WriteHeader(http.StatusAccepted)
+}
+
+func GetProfile(w http.ResponseWriter, r *http.Request) {
+
+	ID := r.URL.Query().Get("id")
+	if len(ID) < 1 {
+		http.Error(w, "Debe enviar el parámetro ID", http.StatusBadRequest)
+		return
+	}
+
+	perfil, err := db.GetUserProfile(ID)
+	if err != nil {
+		http.Error(w, "Ocurrió un error al intentar buscar el registro "+err.Error(), http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("context-type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(perfil)
+}
+
+func UpdateProfile(w http.ResponseWriter, r *http.Request) {
+
+	var t models.User
+
+	err := json.NewDecoder(r.Body).Decode(&t)
+	if err != nil {
+		http.Error(w, "Datos Incorrectos "+err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	var status bool
+
+	status, err = db.UpdateUser(t, UserID)
+	if err != nil {
+		http.Error(w, "Ocurrión un error al intentar modificar el registro. Reintente nuevamente "+err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if !status {
+		http.Error(w, "No se ha logrado modificar el registro del usuario ", http.StatusBadRequest)
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
 }

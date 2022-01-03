@@ -10,7 +10,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-/* MongoCN is the db connection*/
 var MongoCN = connect()
 
 func connect() *mongo.Client {

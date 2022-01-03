@@ -19,20 +19,14 @@ func Login(rw http.ResponseWriter, r *http.Request) {
 		http.Error(rw, "Error decoding"+err.Error(), http.StatusBadRequest)
 		return
 	}
-	if len(u.Email) == 0 {
-		http.Error(rw, "Email de usuario requerido", http.StatusBadRequest)
+	if len(u.Email) == 0 && len(u.Username) == 0 {
+		http.Error(rw, "nombre de usuario o email requerido", http.StatusBadRequest)
 		return
 	}
-	if len(u.Username) == 0 {
-		http.Error(rw, "nombre de usuario requerido", http.StatusBadRequest)
-		return
-	}
+
 	var model models.User
 	var exist bool
-	model, exist = db.Login(u.Email, u.Password)
-	if !exist {
-		model, exist = db.Login(u.Username, u.Password)
-	}
+	model, exist = db.Login(u.Email, u.Username, u.Password)
 	if !exist {
 		http.Error(rw, "usuario y/o contraseña invalidos", http.StatusBadRequest)
 		return

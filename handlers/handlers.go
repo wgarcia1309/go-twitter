@@ -13,8 +13,20 @@ import (
 
 func Handlers() {
 	router := mux.NewRouter()
-	router.HandleFunc("/registro", middleware.CheckDB(routers.Register)).Methods("POST")
+	router.HandleFunc("/registro", middleware.CheckDB(routers.NewUser)).Methods("POST")
 	router.HandleFunc("/login", middleware.CheckDB(routers.Login)).Methods("POST")
+	router.HandleFunc("/verperfil",
+		middleware.CheckDB(
+			middleware.ValidJWT(
+				routers.GetProfile,
+			),
+		)).Methods("GET")
+	router.HandleFunc("/modificarPerfil",
+		middleware.CheckDB(
+			middleware.ValidJWT(
+				routers.UpdateProfile,
+			),
+		)).Methods("PUT")
 	PORT := os.Getenv("PORT")
 	if PORT == "" {
 		PORT = "8080"

@@ -5,10 +5,16 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func Login(emailOrUsername, password string) (models.User, bool) {
-	usr, exitsUsername, _ := UsernameExist(emailOrUsername)
-	usr, existEmail, _ := EmailExist(emailOrUsername)
-	if !existEmail || !exitsUsername {
+func Login(email, username, password string) (models.User, bool) {
+	var usr models.User
+	var exist bool
+	if username != "" {
+		usr, exist, _ = UsernameExist(username)
+	}
+	if email != "" {
+		usr, exist, _ = EmailExist(email)
+	}
+	if !exist {
 		return usr, false
 	}
 	passwordBytes := []byte(password)
