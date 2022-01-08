@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/golang-jwt/jwt"
+	jwt "github.com/golang-jwt/jwt/v4"
 	"github.com/wgarcia1309/go-twitter/db"
 	"github.com/wgarcia1309/go-twitter/models"
 )
