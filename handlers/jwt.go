@@ -12,7 +12,7 @@ import (
 
 var UserEmail string
 
-var UserID string
+var SessionUserID string
 
 func ProcessToken(tokenRaw string) (*models.Claim, bool, string, error) {
 	jwtKey := []byte(os.Getenv("JWTKEY"))
@@ -39,7 +39,7 @@ func ProcessToken(tokenRaw string) (*models.Claim, bool, string, error) {
 	_, found := db.EmailExist(claims.Email)
 	if found {
 		UserEmail = claims.Email
-		UserID = claims.ID.Hex()
+		SessionUserID = claims.ID.Hex()
 	}
-	return claims, found, UserID, nil
+	return claims, found, SessionUserID, nil
 }

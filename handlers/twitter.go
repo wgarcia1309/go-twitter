@@ -19,7 +19,7 @@ func CreateTweet(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tweet.UserID = UserID
+	tweet.UserID = SessionUserID
 	tweet.Date = time.Now()
 
 	err = db.NewTweet(tweet)
@@ -72,7 +72,7 @@ func DeleteTweet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := db.DeleteTweet(tweetID, UserID)
+	err := db.DeleteTweet(tweetID, SessionUserID)
 	if err != nil {
 		http.Error(w, "something went wrong "+err.Error(), http.StatusBadRequest)
 		return
