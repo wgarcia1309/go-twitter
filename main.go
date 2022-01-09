@@ -5,7 +5,7 @@ import (
 
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/wgarcia1309/go-twitter/db"
-	"github.com/wgarcia1309/go-twitter/handlers"
+	"github.com/wgarcia1309/go-twitter/routers"
 )
 
 func main() {
@@ -13,5 +13,5 @@ func main() {
 	if !db.CheckConecction() {
 		log.Fatal("no db connection")
 	}
-	handlers.Handlers()
+	routers.Routers()
 }
