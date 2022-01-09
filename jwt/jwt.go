@@ -10,7 +10,7 @@ import (
 
 func CreateJWT(t models.User) (string, error) {
 
-	miClave := []byte(os.Getenv("JWTKEY"))
+	tokenKey := []byte(os.Getenv("JWTKEY"))
 
 	payload := jwt.MapClaims{
 		"email":            t.Email,
@@ -25,7 +25,7 @@ func CreateJWT(t models.User) (string, error) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, payload)
-	tokenStr, err := token.SignedString(miClave)
+	tokenStr, err := token.SignedString(tokenKey)
 	if err != nil {
 		return tokenStr, err
 	}

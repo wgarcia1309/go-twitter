@@ -10,7 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func NewUser(u models.User) (string, bool, error) {
+func NewUser(u models.User) (string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Hour)
 	defer cancel()
 	db := MongoCN.Database(os.Getenv("DATABASENAME"))
@@ -20,14 +20,14 @@ func NewUser(u models.User) (string, bool, error) {
 
 	result, err := collection.InsertOne(ctx, u)
 	if err != nil {
-		return "", false, err
+		return "", err
 	}
 
 	objectID, _ := result.InsertedID.(primitive.ObjectID)
-	return objectID.String(), true, nil
+	return objectID.String(), nil
 }
 
-func EmailExist(email string) (models.User, bool, string) {
+func EmailExist(email string) (models.User, bool) {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
@@ -37,14 +37,13 @@ func EmailExist(email string) (models.User, bool, string) {
 
 	var user models.User
 	err := collection.FindOne(ctx, condition).Decode(&user)
-	ID := user.ID.Hex()
 	if err != nil {
-		return user, false, ID
+		return user, false
 	}
-	return user, true, ID
+	return user, true
 }
 
-func UsernameExist(username string) (models.User, bool, string) {
+func UsernameExist(username string) (models.User, bool) {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Hour)
 	defer cancel()
 
@@ -54,11 +53,10 @@ func UsernameExist(username string) (models.User, bool, string) {
 
 	var user models.User
 	err := collection.FindOne(ctx, condition).Decode(&user)
-	ID := user.ID.Hex()
 	if err != nil {
-		return user, false, ID
+		return user, false
 	}
-	return user, true, ID
+	return user, true
 }
 
 func GetUserProfile(ID string) (models.User, error) {
@@ -68,20 +66,20 @@ func GetUserProfile(ID string) (models.User, error) {
 	db := MongoCN.Database(os.Getenv("DATABASENAME"))
 	col := db.Collection(os.Getenv("USER_COLLECTION"))
 
-	var perfilProfile models.User
+	var UserProfile models.User
 	objID, _ := primitive.ObjectIDFromHex(ID)
 
-	condicion := bson.M{"_id": objID}
+	condition := bson.M{"_id": objID}
 
-	err := col.FindOne(ctx, condicion).Decode(&perfilProfile)
-	perfilProfile.Password = ""
+	err := col.FindOne(ctx, condition).Decode(&UserProfile)
+	UserProfile.Password = ""
 	if err != nil {
-		return perfilProfile, err
+		return UserProfile, err
 	}
-	return perfilProfile, nil
+	return UserProfile, nil
 }
 
-func UpdateUser(u models.User, ID string) (bool, error) {
+func UpdateUser(u models.User, ID string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
@@ -123,8 +121,8 @@ func UpdateUser(u models.User, ID string) (bool, error) {
 
 	_, err := col.UpdateOne(ctx, filtro, updtString)
 	if err != nil {
-		return false, err
+		return err
 	}
 
-	return true, nil
+	return nil
 }

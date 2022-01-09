@@ -7,14 +7,14 @@ import (
 
 func Login(email, username, password string) (models.User, bool) {
 	var usr models.User
-	var exist bool
+	var found bool
 	if username != "" {
-		usr, exist, _ = UsernameExist(username)
+		usr, found = UsernameExist(username)
 	}
 	if email != "" {
-		usr, exist, _ = EmailExist(email)
+		usr, found = EmailExist(email)
 	}
-	if !exist {
+	if !found {
 		return usr, false
 	}
 	passwordBytes := []byte(password)

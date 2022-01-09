@@ -13,20 +13,17 @@ import (
 
 func Handlers() {
 	router := mux.NewRouter()
-	router.HandleFunc("/registro", middleware.CheckDB(routers.NewUser)).Methods("POST")
 	router.HandleFunc("/login", middleware.CheckDB(routers.Login)).Methods("POST")
-	router.HandleFunc("/verperfil",
-		middleware.CheckDB(
-			middleware.ValidJWT(
-				routers.GetProfile,
-			),
-		)).Methods("GET")
-	router.HandleFunc("/modificarPerfil",
-		middleware.CheckDB(
-			middleware.ValidJWT(
-				routers.UpdateProfile,
-			),
-		)).Methods("PUT")
+
+	userRouter := router.PathPrefix("user").Subrouter()
+	userRouter.HandleFunc("/", middleware.CheckDB(routers.NewUser)).Methods("POST")
+	userRouter.HandleFunc("/", middleware.CheckDB(middleware.ValidJWT(routers.GetProfile))).Methods("GET")
+	userRouter.HandleFunc("/", middleware.CheckDB(middleware.ValidJWT(routers.UpdateProfile))).Methods("PUT")
+	twwetRouter := router.PathPrefix("tweet").Subrouter()
+	twwetRouter.HandleFunc("/", middleware.CheckDB(middleware.ValidJWT(routers.CreateTweet))).Methods("POST")
+	twwetRouter.HandleFunc("/", middleware.CheckDB(middleware.ValidJWT(routers.GetTweets))).Methods("GET")
+	twwetRouter.HandleFunc("/", middleware.CheckDB(middleware.ValidJWT(routers.DeleteTweet))).Methods("DELETE")
+
 	PORT := os.Getenv("PORT")
 	if PORT == "" {
 		PORT = "8080"

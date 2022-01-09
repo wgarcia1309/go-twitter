@@ -20,25 +20,29 @@ func Login(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if len(u.Email) == 0 && len(u.Username) == 0 {
-		http.Error(rw, "nombre de usuario o email requerido", http.StatusBadRequest)
+		http.Error(rw, "username or email required", http.StatusBadRequest)
 		return
 	}
 
+	if len(u.Password) == 0 {
+		http.Error(rw, "password required", http.StatusBadRequest)
+		return
+	}
 	var model models.User
-	var exist bool
-	model, exist = db.Login(u.Email, u.Username, u.Password)
-	if !exist {
-		http.Error(rw, "usuario y/o contraseña invalidos", http.StatusBadRequest)
+	model, ok := db.Login(u.Email, u.Username, u.Password)
+	if !ok {
+		http.Error(rw, "Wrong username or password", http.StatusBadRequest)
 		return
 	}
-	jwtkey, err := jwt.CreateJWT(model)
+	jwt, err := jwt.CreateJWT(model)
 	if err != nil {
-		http.Error(rw, "Error generating jwt"+err.Error(), http.StatusInternalServerError)
+		http.Error(rw, "Error creating jwt : "+err.Error(), http.StatusInternalServerError)
+	}
 
-	}
 	resp := models.RespuestaLogin{
-		Token: jwtkey,
+		Token: jwt,
 	}
+
 	rw.Header().Set("Content-Type", "application/json")
 	rw.WriteHeader(http.StatusCreated)
 	json.NewEncoder(rw).Encode(resp)
@@ -46,7 +50,7 @@ func Login(rw http.ResponseWriter, r *http.Request) {
 	expirationTime := time.Now().Add(24 * time.Hour)
 	http.SetCookie(rw, &http.Cookie{
 		Name:    "token",
-		Value:   jwtkey,
+		Value:   jwt,
 		Expires: expirationTime,
 	})
 }

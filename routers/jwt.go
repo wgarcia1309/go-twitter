@@ -14,30 +14,32 @@ var UserEmail string
 
 var UserID string
 
-func ProcessToken(tk string) (*models.Claim, bool, string, error) {
+func ProcessToken(tokenRaw string) (*models.Claim, bool, string, error) {
 	jwtKey := []byte(os.Getenv("JWTKEY"))
 	claims := &models.Claim{}
 
-	splitToken := strings.Split(tk, "Bearer")
+	splitToken := strings.Split(tokenRaw, "Bearer")
 	if len(splitToken) != 2 {
-		return claims, false, string(""), errors.New("formato de token invalido")
+		return claims, false, string(""), errors.New("invalid token format")
 	}
 
-	tk = strings.TrimSpace(splitToken[1])
+	tokenRaw = strings.TrimSpace(splitToken[1])
 
-	tkn, err := jwt.ParseWithClaims(tk, claims, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(tokenRaw, claims, func(token *jwt.Token) (interface{}, error) {
 		return jwtKey, nil
 	})
-	if err == nil {
-		_, encontrado, _ := db.EmailExist(claims.Email)
-		if encontrado {
-			UserEmail = claims.Email
-			UserID = claims.ID.Hex()
-		}
-		return claims, encontrado, UserID, nil
+	if err != nil {
+		return claims, false, string(""), err
 	}
-	if !tkn.Valid {
-		return claims, false, string(""), errors.New("token Inválido")
+
+	if !token.Valid {
+		return claims, false, string(""), errors.New("invalid token")
 	}
-	return claims, false, string(""), err
+
+	_, found := db.EmailExist(claims.Email)
+	if found {
+		UserEmail = claims.Email
+		UserID = claims.ID.Hex()
+	}
+	return claims, found, UserID, nil
 }
