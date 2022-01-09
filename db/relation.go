@@ -45,13 +45,13 @@ func GetRelation(t models.Relation) error {
 	db := MongoCN.Database(os.Getenv("DATABASENAME"))
 	col := db.Collection(os.Getenv("RELATION_COLLECTION"))
 
-	condicion := bson.M{
+	condition := bson.M{
 		"userID":         t.UserID,
 		"userRelationID": t.UserRelationID,
 	}
 
 	var result models.Relation
-	err := col.FindOne(ctx, condicion).Decode(&result)
+	err := col.FindOne(ctx, condition).Decode(&result)
 	if err != nil {
 		return err
 	}

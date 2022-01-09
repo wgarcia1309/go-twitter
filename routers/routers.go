@@ -29,6 +29,9 @@ func Routers() {
 	router.HandleFunc("/unfollow", middleware.CheckDB(middleware.ValidJWT(handlers.Unfollow))).Methods("DELETE")
 	router.HandleFunc("/following", middleware.CheckDB(middleware.ValidJWT(handlers.GetRelation))).Methods("GET")
 
+	router.HandleFunc("/search", middleware.CheckDB(middleware.ValidJWT(handlers.FindUsers))).Methods("GET")
+	router.HandleFunc("/feed", middleware.CheckDB(middleware.ValidJWT(handlers.GetFeed))).Methods("GET")
+
 	PORT := os.Getenv("PORT")
 	if PORT == "" {
 		PORT = "8080"
